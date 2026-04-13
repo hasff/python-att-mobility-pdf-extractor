@@ -171,6 +171,18 @@ def extract_data(FILE, inspect=False):
 
             elif 'Data Usage For:' in header_text:
                 section_type = 'data'
+
+                # FIX for specific case for this section type
+                table[0].pop()
+                table[0].extend(['Description', 'Cell Location'])
+                for row in table[1:]:
+                    last_col = row.pop() 
+                    
+                    description, cell_location = last_col.split('[', 1)
+                    description = description.strip()
+                    cell_location = '[' + cell_location
+                    row.extend([description, cell_location])                
+
                 if len(data_data) == 0:
                     data_data.append(table[0])
                 data_data.extend(table[1:])
@@ -205,7 +217,7 @@ def write_csv(path, data):
 
 if __name__ == "__main__":
 
-    FILE = INPUT_DIR / "example.pdf"
+    FILE = INPUT_DIR / "att_original.pdf"
     data = extract_data(FILE, inspect=True) 
 
     write_csv(VOICE_CSV, data['voice'])
